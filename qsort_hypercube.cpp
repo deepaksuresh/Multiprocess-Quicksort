@@ -300,7 +300,6 @@ void HyperCube_Class::HyperCube_QuickSort() {
 	// printf("rank %d: k is %d my median is %d\n", my_id, k, local_median);
 	MPI_Allreduce(&local_median, &pivot, 1, MPI_INT, MPI_SUM, sub_hypercube_comm);
 	pivot = pivot/sub_hypercube_size;
-	// printf("rank %d: k is %d my pivot is %d\n", my_id, k, pivot);
 	// Search for smallest element in list which is larger than pivot
 	// Upon return:
 	//   list[0 ... idx-1] <= pivot
@@ -317,11 +316,9 @@ void HyperCube_Class::HyperCube_QuickSort() {
 	    // MPI-2: Send number of elements greater than pivot
 	    // ***** Add MPI call here *****
 		MPI_Send(&list_size_gt, 1, MPI_INT, nbr_k, tag, MPI_COMM_WORLD);
-		// printf("(rank = %d):sent  %d to  %d\n", my_id, list_size_gt, nbr_k);
 	    // MPI-3: Receive number of elements less than or equal to pivot
 	    // ***** Add MPI call here *****
 		MPI_Recv(&nbr_list_size, 1, MPI_INT, nbr_k, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		// printf("(rank = %d):received  %d from  %d\n", my_id, nbr_list_size, nbr_k);
 	    // Allocate storage for neighbor's list
 	    nbr_list = new int[nbr_list_size];
 
@@ -333,21 +330,10 @@ void HyperCube_Class::HyperCube_QuickSort() {
 		}
 	    // ***** Add MPI call here *****
 		MPI_Send(data, list_size_gt, MPI_INT, nbr_k, tag, MPI_COMM_WORLD);
-		// for (int i=0;i<list_size_gt;i++)
-		// {
-		// 	printf("rank = %d: sending %d (data) to %d", my_id, list[i], nbr_k);
-		// }
-		//printf("SENT\n");
 	    // MPI-5: Receive neighbor's list of elements that are less than or equal to pivot
 
 	    // ***** Add MPI call here *****
 		MPI_Recv(nbr_list, nbr_list_size, MPI_INT, nbr_k, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		// printf("About to print RECEIVED\n");
-        //         for (int j=0;j<nbr_list_size;j++)
-		// {
-		// 	printf("rank = %d: receiving %d from %d", my_id, nbr_list[j], nbr_k);
-		// }
-        // printf("RECEIVED\n");
 	    // Merge local list of elements less than or equal to pivot with neighbor's list
 	    new_list = merged_list(list, idx, nbr_list, nbr_list_size); 
 
@@ -362,12 +348,10 @@ void HyperCube_Class::HyperCube_QuickSort() {
 
 	    // ***** Add MPI call here *****
 		MPI_Recv(&nbr_list_size, 1, MPI_INT, nbr_k, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		// printf("(rank = %d):received  %d from  %d\n", my_id, nbr_list_size, nbr_k);
 	    // MPI-7: Send number of elements less than or equal to pivot
 
 	    // ***** Add MPI call here *****
 		MPI_Send(&list_size_leq, 1, MPI_INT, nbr_k, tag, MPI_COMM_WORLD);
-		// printf("(rank = %d):sent  %d to  %d\n", my_id, list_size_gt, nbr_k);
 	    // Allocate storage for neighbor's list
 	    nbr_list = new int[nbr_list_size]; 
 
@@ -385,11 +369,6 @@ void HyperCube_Class::HyperCube_QuickSort() {
 		
 	    // ***** Add MPI call here *****
 		MPI_Send(data, list_size_leq, MPI_INT, nbr_k, tag, MPI_COMM_WORLD);
-		// for (int i=0;i<list_size_leq;i++)
-		// {
-		// 	printf("rank = %d: sending %d to %d", my_id, list[i], nbr_k);
-		// }
-		// printf("\n");
 	    // Merge local list of elements greater than pivot with neighbor's list
 	    new_list = merged_list(&list[idx], list_size_gt, nbr_list, nbr_list_size); 
 
