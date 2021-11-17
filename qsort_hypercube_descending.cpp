@@ -297,8 +297,10 @@ void HyperCube_Class::HyperCube_QuickSort() {
 	// compute the sum of local_median values on processes of this hypercube
 
 	// ***** Add MPI call here *****
+	// printf("rank %d: k is %d my median is %d\n", my_id, k, local_median);
 	MPI_Allreduce(&local_median, &pivot, 1, MPI_INT, MPI_SUM, sub_hypercube_comm);
 	pivot = pivot/sub_hypercube_size;
+	// printf("rank %d: k is %d my pivot is %d\n", my_id, k, pivot);
 	// Search for smallest element in list which is larger than pivot
 	// Upon return:
 	//   list[0 ... idx-1] <= pivot
@@ -337,7 +339,8 @@ void HyperCube_Class::HyperCube_QuickSort() {
 	    new_list = merged_list(list, idx, nbr_list, nbr_list_size); 
 
 	    // Replace local list with new_list, update size
-	    delete [] list; 
+	    delete [] data;
+            delete [] list; 
 	    delete [] nbr_list; 
 	    list = new_list; 
 	    list_size = list_size_leq+nbr_list_size;
@@ -371,8 +374,8 @@ void HyperCube_Class::HyperCube_QuickSort() {
 	    new_list = merged_list(&list[idx], list_size_gt, nbr_list, nbr_list_size); 
 
 	    // Replace local list with new_list, update size
-		delete [] data;
-	    delete [] list; 
+	    delete [] data;
+        delete [] list; 
 	    delete [] nbr_list; 
 	    list = new_list; 
 	    list_size = list_size_gt+nbr_list_size;
